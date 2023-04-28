@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Location Sharing App</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Ti bet yo</h1>
+        <p>pataje lokalizyonw pou nou ka konn kibo imigrasyon ye:</p>
+        <button onclick="getLocation()">klike la pouw pataje kote yo ye</button>
+        <a href="./view_locations.php">Lis tout kote imigrasyon te ye deja</a>
+        <div id="map"></div>
+    </div>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError, { enableHighAccuracy: true });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            // Save location to file using AJAX
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'save_location.php', true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.onload = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    alert(this.responseText);
+                }
+            };
+            xhr.send('latitude=' + latitude + '&longitude=' + longitude);
+
+            // Open location in Google Maps
+            var url = "https://www.google.com/maps/place/" + latitude + "," + longitude;
+            window.open(url);
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
